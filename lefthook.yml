@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  commands:
+    types:
+      glob: "*.{ts}"
+      run: npm run lint:types
+    lint:
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc,md,mdx,yml,yaml,css,scss,html}"
+      run: npm run lint:fix -- --colors=off {staged_files}
+      stage_fixed: true
+    unused:
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
+      run: npm run knip
+    build:
+      glob: "packages/client/package.json,src/routers/**/*.ts"
+      run: npm run build

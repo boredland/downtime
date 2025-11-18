@@ -1,0 +1,38 @@
+{
+	"name": "@boredland/downtime",
+	"version": "1.0.0",
+	"description": "",
+	"main": "./dist/node.mjs",
+	"type": "module",
+	"scripts": {
+		"dev": "NODE_DEBUG=downtime node --watch --watch-preserve-output --experimental-strip-types src/index.ts",
+		"build": "tsdown",
+		"knip": "knip",
+		"lint": "run-s -l lint:*",
+		"lint:types": "tsc",
+		"lint:fix": "biome check --fix --no-errors-on-unmatched"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@biomejs/biome": "2.3.6",
+		"@types/node": "24.10.1",
+		"knip": "5.69.1",
+		"lefthook": "2.0.4",
+		"npm-run-all2": "8.0.4",
+		"p-throttle": "8.1.0",
+		"tsdown": "0.16.5",
+		"typescript": "5.9.3"
+	},
+	"dependencies": {
+		"@scalar/json-magic": "0.8.1",
+		"@scalar/openapi-parser": "0.23.2",
+		"devalue": "5.5.0"
+	},
+	"module": "./dist/node.mjs",
+	"types": "./dist/node.d.mts",
+	"exports": {
+		".": "./dist/node.mjs",
+		"./*": "./*"
+	}
+}
