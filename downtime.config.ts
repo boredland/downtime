@@ -1,7 +1,7 @@
 import { defineConfig } from "./src/index.ts";
 
 export default defineConfig({
-	openapiSpecUrl: "https://indexer.staging.bgdlabs.com/spec.json",
+	openapiSpecUrl: "https://registry.scalar.com/@scalar/apis/galaxy?format=yaml",
 	getExampleValue: (paramName: string) => {
 		if (paramName === "chainId") {
 			return "1";
