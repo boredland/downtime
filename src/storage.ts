@@ -36,7 +36,12 @@ export class Storage {
 		if (this.data === null) {
 			try {
 				this.data = await read(this.storagePath);
-			} catch {
+			} catch (error) {
+				// biome-ignore lint/suspicious/noConsole: Want to see what is going on here
+				console.error(
+					`Storage: No existing storage found at ${this.storagePath}, starting fresh.`,
+					error,
+				);
 				this.data = new Map();
 			}
 		}
