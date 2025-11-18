@@ -55,6 +55,7 @@ export class SlackAlert implements Alert {
 				{
 					color: category,
 					text,
+					mrkdwn_in: ["text"],
 				},
 			],
 		});
@@ -62,21 +63,21 @@ export class SlackAlert implements Alert {
 
 	async onUp(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`:white_check_mark: [ALERT - UP] Path: (${path})[${state.url}] is UP (${state.durationMs}ms).`,
+			`🟢 (${path})[${state.url}] is UP (${state.durationMs}ms).`,
 			"good",
 		);
 	}
 
 	async onDown(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`:x: [ALERT - DOWN] Path: (${path})[${state.url}] is DOWN (${state.durationMs}ms).`,
+			`🔴 (${path})[${state.url}] is DOWN (${state.durationMs}ms).`,
 			"danger",
 		);
 	}
 
 	async onDegraded(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`:warning: [ALERT - DEGRADED] Path: (${path})[${state.url}] is DEGRADED (${state.durationMs}ms).`,
+			`🟡 (${path})[${state.url}] is DEGRADED (${state.durationMs}ms).`,
 			"warning",
 		);
 	}
