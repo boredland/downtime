@@ -1,0 +1,48 @@
+name: Dowwntime check
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" # Every 5 minutes
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/dowwntime.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dowwntime-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: dowwntime
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
+        with:
+          node-version: 24
+      - name: Create package.json
+        run: echo '{"name":"dowwntime","version":"1.0.0","type":"module"}' > package.json
+
+      - name: Install dependencies
+        run: npm i dowwntime@latest
+      - name: retrieve config
+        run: |
+          git fetch origin main
+          git checkout origin/main dowwntime.config.ts
+          git reset
+      - name: Run dowwntime check
+        id: result
+        run: |
+          npx dowwntime@latest
+      - name: Check in result
+        run: |
+          git add .
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: Dowwntime check result at $(date -u +"%Y-%m-%dT%H:%M:%SZ")" || echo "No changes to commit"
+          git push origin HEAD:dowwntime

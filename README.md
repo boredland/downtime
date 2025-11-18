@@ -258,6 +258,8 @@ jobs:
 
       - name: Run downtime check
         id: result
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # If using Slack alerts
         run: npx dowwntime
 
       - name: Commit results
