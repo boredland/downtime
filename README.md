@@ -149,9 +149,6 @@ Provide custom example values for path and query parameters. Useful when paramet
 
 ```typescript
 getExampleValue: (paramName: string, path: string) => {
-  if (paramName === "chainId") {
-    return "1";
-  }
   if (paramName === "userId") {
     return "12345";
   }
