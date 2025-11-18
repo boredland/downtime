@@ -6,6 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "NODE_DEBUG=downtime node --watch --watch-preserve-output --experimental-strip-types src/index.ts",
+		"cli": "NODE_DEBUG=downtime node --watch --watch-preserve-output --experimental-strip-types src/cli.ts",
 		"build": "tsdown",
 		"knip": "knip",
 		"lint": "run-s -l lint:*",
@@ -19,6 +20,7 @@
 		"@scalar/json-magic": "0.8.1",
 		"@scalar/openapi-parser": "0.23.2",
 		"@types/node": "24.10.1",
+		"commander": "14.0.2",
 		"devalue": "5.5.0",
 		"knip": "5.69.1",
 		"lefthook": "2.0.4",
@@ -30,7 +32,8 @@
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.mts",
 	"exports": {
-		".": "./dist/index.mjs",
+		"./cli": "./dist/cli.mjs",
+		"./lib": "./dist/lib.mjs",
 		"./*": "./*"
 	}
 }

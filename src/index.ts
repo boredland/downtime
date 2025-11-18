@@ -16,7 +16,11 @@ type Options = {
 	concurrency?: number;
 	baseUrl?: string;
 	getExampleValue?: (paramName: string, path: string) => string | undefined;
-	getStatus?: (statusCode: number, path: string) => "up" | "down" | "degraded";
+	getStatus?: (
+		statusCode: number,
+		path: string,
+		durationMs: number,
+	) => "up" | "down" | "degraded";
 	timeoutMs?: number;
 };
 
@@ -124,7 +128,7 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 			durationMs = Date.now() - start;
 
 			if (options.getStatus) {
-				status = options.getStatus(response.status, path);
+				status = options.getStatus(response.status, path, durationMs);
 			} else {
 				status = response.ok ? "up" : "down";
 			}
@@ -156,16 +160,3 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 
 	await measurements.flush();
 };
-
-await run({
-	openapiSpecUrl: "https://indexer.staging.bgdlabs.com/spec.json",
-	getExampleValue: (paramName: string) => {
-		if (paramName === "chainId") {
-			return "1";
-		}
-		return undefined;
-	},
-	concurrency: 10,
-	timeoutMs: 5000,
-	storagePath: "./storage.tmp",
-});

@@ -19,6 +19,7 @@ export class Storage {
 	private data: StorageData | null = null;
 	private storagePath: string;
 	private maxItems: number;
+	private updatedPaths = new Set<string>();
 
 	/**
 	 * @param storagePath where to store the data
@@ -54,10 +55,18 @@ export class Storage {
 			...before,
 			[measurement.timestamp, measurement.status, measurement.durationMs],
 		]);
+		this.updatedPaths.add(path);
 	}
 
 	public async flush() {
 		const data = await this.ensureLoaded();
+		// Cleanup paths that were were not updated
+		for (const path of data.keys()) {
+			if (!this.updatedPaths.has(path)) {
+				// biome-ignore lint/style/noNonNullAssertion: checked above
+				this.data!.delete(path);
+			}
+		}
 		await store(this.storagePath, data);
 	}
 }
