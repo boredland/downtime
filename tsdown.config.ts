@@ -1,16 +1,24 @@
 import { defineConfig } from "tsdown";
 
-export default defineConfig({
-	entry: {
-		main: "src/index.ts",
-		cli: "src/cli.ts",
+export default defineConfig([
+	{
+		exports: true,
+		clean: true,
+		format: ["esm"],
+		treeshake: true,
+		dts: {
+			resolve: true,
+		},
+		removeNodeProtocol: true,
 	},
-	exports: true,
-	clean: true,
-	format: ["esm"],
-	treeshake: true,
-	dts: {
-		resolve: true,
+	{
+		entry: "src/cli.ts",
+		clean: true,
+		format: ["esm"],
+		treeshake: true,
+		dts: {
+			resolve: true,
+		},
+		removeNodeProtocol: true,
 	},
-	removeNodeProtocol: true,
-});
+]);

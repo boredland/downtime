@@ -1,6 +1,6 @@
 {
 	"name": "dowwntime",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "",
 	"type": "module",
 	"scripts": {
@@ -29,18 +29,18 @@
 		"tsdown": "0.16.5",
 		"typescript": "5.9.3"
 	},
-	"bin": "./dist/cli.mjs",
 	"publishConfig": {
 		"access": "public"
 	},
 	"files": [
 		"dist"
 	],
+	"bin": "./dist/cli.mjs",
 	"exports": {
-		"./cli": "./dist/cli.mjs",
-		"./main": "./dist/main.mjs",
+		".": "./dist/index.mjs",
 		"./package.json": "./package.json"
 	},
-	"types": "./dist/main.d.ts",
-	"main": "./dist/main.mjs"
+	"types": "./dist/index.d.mts",
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs"
 }
