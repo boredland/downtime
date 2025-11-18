@@ -90,4 +90,15 @@ export class Storage {
 
 		await store(this.storagePath, data);
 	}
+
+	public async getState(path: string) {
+		const data = await this.ensureLoaded();
+		const pathData = data.get(path);
+
+		return {
+			current: pathData ? pathData[pathData.length - 1] : null,
+			previous:
+				pathData && pathData.length > 1 ? pathData[pathData.length - 2] : null,
+		};
+	}
 }

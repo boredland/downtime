@@ -1,4 +1,4 @@
-import { defineConfig } from "./src/index.ts";
+import { ConsoleAlert, defineConfig } from "./src/index.ts";
 
 export default defineConfig({
 	openapiSpecUrl: "https://registry.scalar.com/@scalar/apis/galaxy?format=yaml",
@@ -12,4 +12,5 @@ export default defineConfig({
 	timeoutMs: 5000,
 	storagePath: "./storage.tmp",
 	maxSpaceUsageBytes: 262144 * 0.1,
+	alerts: [new ConsoleAlert()],
 });

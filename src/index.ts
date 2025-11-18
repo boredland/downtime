@@ -7,6 +7,7 @@ import {
 import { readFiles } from "@scalar/json-magic/bundle/plugins/node";
 import { dereference } from "@scalar/openapi-parser";
 import pThrottle from "p-throttle";
+import type { Alert } from "./alert.ts";
 import { debug } from "./debug.ts";
 import { Storage } from "./storage.ts";
 
@@ -23,6 +24,7 @@ type Options = {
 	) => "up" | "down" | "degraded";
 	timeoutMs?: number;
 	maxSpaceUsageBytes?: number;
+	alerts: Alert[];
 };
 
 export const defineConfig = (options: Options) => {
@@ -163,4 +165,27 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 	);
 
 	await measurements.flush();
+
+	for (const path of fetchConfigurations.keys()) {
+		const state = await measurements.getState(path);
+		if (
+			!state.current ||
+			(!state.previous && state.current[1] === "up") ||
+			(state.previous && state.previous[1] === state.current[1])
+		) {
+			continue;
+		}
+
+		for (const alert of options.alerts) {
+			if (state.current[1] === "up") {
+				await alert.onUp(path);
+			} else if (state.current[1] === "down") {
+				await alert.onDown(path);
+			} else if (state.current[1] === "degraded") {
+				await alert.onDegraded(path);
+			}
+		}
+	}
 };
+
+export * from "./alert.ts";
