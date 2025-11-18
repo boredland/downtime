@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { debug } from "./debug.ts";
 import { deserialize, serialize } from "./serializer.ts";
 
-type Measurement = [number, "up" | "down" | "degraded", number];
+type Measurement = [number, "up" | "down" | "degraded", number, string];
 type StorageData = Map<string, Measurement[]>;
 
 const read = async (path: string) => {
@@ -54,12 +54,18 @@ export class Storage {
 			timestamp: Measurement[0];
 			status: Measurement[1];
 			durationMs: Measurement[2];
+			url: Measurement[3];
 		},
 	) {
 		const data = await this.ensureLoaded();
 		data.set(path, [
 			...(data.get(path) || []),
-			[measurement.timestamp, measurement.status, measurement.durationMs],
+			[
+				measurement.timestamp,
+				measurement.status,
+				measurement.durationMs,
+				measurement.url,
+			],
 		]);
 		this.updatedPaths.add(path);
 	}
@@ -100,10 +106,27 @@ export class Storage {
 		const data = await this.ensureLoaded();
 		const pathData = data.get(path);
 
+		const current = pathData ? pathData[pathData.length - 1] : null;
+		const previous =
+			pathData && pathData.length > 1 ? pathData[pathData.length - 2] : null;
+
 		return {
-			current: pathData ? pathData[pathData.length - 1] : null,
-			previous:
-				pathData && pathData.length > 1 ? pathData[pathData.length - 2] : null,
+			current: current
+				? {
+						timestamp: current[0],
+						status: current[1],
+						durationMs: current[2],
+						url: current[3],
+					}
+				: null,
+			previous: previous
+				? {
+						timestamp: previous[0],
+						status: previous[1],
+						durationMs: previous[2],
+						url: previous[3],
+					}
+				: null,
 		};
 	}
 }

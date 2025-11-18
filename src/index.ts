@@ -147,6 +147,7 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 			status,
 			durationMs,
 			timestamp: start,
+			url: url.toString(),
 		};
 	};
 
@@ -167,22 +168,22 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 	await measurements.flush();
 
 	for (const path of fetchConfigurations.keys()) {
-		const state = await measurements.getState(path);
+		const { current, previous } = await measurements.getState(path);
 		if (
-			!state.current ||
-			(!state.previous && state.current[1] === "up") ||
-			(state.previous && state.previous[1] === state.current[1])
+			!current ||
+			(!previous && current.status === "up") ||
+			(previous && previous.status === current.status)
 		) {
 			continue;
 		}
 
 		for (const alert of options.alerts) {
-			if (state.current[1] === "up") {
-				await alert.onUp(path);
-			} else if (state.current[1] === "down") {
-				await alert.onDown(path);
-			} else if (state.current[1] === "degraded") {
-				await alert.onDegraded(path);
+			if (current.status === "up") {
+				await alert.onUp(path, current);
+			} else if (current.status === "down") {
+				await alert.onDown(path, current);
+			} else if (current.status === "degraded") {
+				await alert.onDegraded(path, current);
 			}
 		}
 	}
