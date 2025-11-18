@@ -42,5 +42,8 @@
 	},
 	"types": "./dist/index.d.mts",
 	"main": "./dist/index.mjs",
-	"module": "./dist/index.mjs"
+	"module": "./dist/index.mjs",
+	"engines": {
+		"node": ">=24"
+	}
 }
