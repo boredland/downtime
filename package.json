@@ -1,8 +1,7 @@
 {
 	"name": "dowwntime",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "",
-	"main": "./dist/index.mjs",
 	"type": "module",
 	"scripts": {
 		"dev": "NODE_DEBUG=downtime node --watch --watch-preserve-output --experimental-strip-types src/index.ts",
@@ -11,7 +10,8 @@
 		"knip": "knip",
 		"lint": "run-s -l lint:*",
 		"lint:types": "tsc",
-		"lint:fix": "biome check --fix --no-errors-on-unmatched"
+		"lint:fix": "biome check --fix --no-errors-on-unmatched",
+		"prepublishOnly": "npm run build"
 	},
 	"author": "Jonas Strassel <info@jonas-strassel.de>",
 	"license": "MIT",
@@ -29,18 +29,18 @@
 		"tsdown": "0.16.5",
 		"typescript": "5.9.3"
 	},
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.mts",
-	"exports": {
-		"./cli": "./dist/cli.mjs",
-		"./lib": "./dist/lib.mjs",
-		"./*": "./*"
-	},
 	"bin": "./dist/cli.mjs",
 	"publishConfig": {
 		"access": "public"
 	},
 	"files": [
 		"dist"
-	]
+	],
+	"exports": {
+		"./cli": "./dist/cli.mjs",
+		"./main": "./dist/main.mjs",
+		"./package.json": "./package.json"
+	},
+	"types": "./dist/main.d.ts",
+	"main": "./dist/main.mjs"
 }

@@ -2,12 +2,10 @@ import { defineConfig } from "tsdown";
 
 export default defineConfig({
 	entry: {
-		lib: "src/index.ts",
+		main: "src/index.ts",
 		cli: "src/cli.ts",
 	},
-	exports: {
-		all: true,
-	},
+	exports: true,
 	clean: true,
 	format: ["esm"],
 	treeshake: true,
