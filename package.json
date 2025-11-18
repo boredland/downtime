@@ -1,5 +1,5 @@
 {
-	"name": "@boredland/downtime",
+	"name": "dowwntime",
 	"version": "1.0.0",
 	"description": "",
 	"main": "./dist/index.mjs",
