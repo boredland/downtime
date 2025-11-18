@@ -22,6 +22,7 @@ type Options = {
 		durationMs: number,
 	) => "up" | "down" | "degraded";
 	timeoutMs?: number;
+	maxSpaceUsageBytes?: number;
 };
 
 export const defineConfig = (options: Options) => {
@@ -109,7 +110,10 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 		}
 	}
 
-	const measurements = new Storage(options.storagePath);
+	const measurements = new Storage(
+		options.storagePath,
+		options.maxSpaceUsageBytes ?? 262144 * 0.95,
+	);
 
 	const measure = async (path: string) => {
 		const url = fetchConfigurations.get(path);

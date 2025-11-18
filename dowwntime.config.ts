@@ -11,4 +11,5 @@ export default defineConfig({
 	concurrency: 10,
 	timeoutMs: 5000,
 	storagePath: "./storage.tmp",
+	maxSpaceUsageBytes: 262144 * 0.1,
 });

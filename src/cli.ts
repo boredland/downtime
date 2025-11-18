@@ -3,7 +3,7 @@ import { program } from "commander";
 program.option(
 	"-c, --config [string]",
 	"Path to config file",
-	"downtime.config.ts",
+	"dowwntime.config.ts",
 );
 
 program.parse();

@@ -27,7 +27,7 @@ export class Storage {
 	 * @param storagePath where to store the data
 	 * @param maxItems maximum number of items to store per path (default: keep last 4 weeks of 5-minute intervals)
 	 */
-	constructor(storagePath: string, maxSpaceUsageBytes = 262144 * 0.95) {
+	constructor(storagePath: string, maxSpaceUsageBytes: number) {
 		this.storagePath = storagePath;
 		this.maxSpaceUsageBytes = maxSpaceUsageBytes;
 	}
