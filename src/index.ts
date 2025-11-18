@@ -169,24 +169,25 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 
 	await Promise.all(
 		Array.from(fetchConfigurations.keys()).map(async (path) => {
-			const measurement = (
-				await Promise.all(
-					new Array(options.samples ?? 5).map((_v) => throttledMeasure(path)),
-				)
-			).reduce(
+			const mesaurements = await Promise.all(
+				Array.from({ length: options.samples ?? 5 }).map(() =>
+					throttledMeasure(path),
+				),
+			);
+			const measurement = mesaurements.reduce(
 				(acc, curr) => {
-					if (!curr) return acc;
 					if (!acc) return curr;
+					if (!curr) return acc;
 
-					// If any measurement is down, the overall status is down
 					acc.status = curr.status;
 					// For duration, we take the average of measurements
-					acc.durationMs = (acc.durationMs + curr.durationMs) / 2;
+					acc.durationMs = Math.round((acc.durationMs + curr.durationMs) / 2);
 
 					return acc;
 				},
 				undefined satisfies Awaited<ReturnType<typeof measure>>,
 			);
+
 			debug(`Measured ${path}:`, measurement);
 			if (!measurement) return;
 			await measurements.add(path, measurement);
