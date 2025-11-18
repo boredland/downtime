@@ -13,8 +13,8 @@
 		"lint:types": "tsc",
 		"lint:fix": "biome check --fix --no-errors-on-unmatched"
 	},
-	"author": "",
-	"license": "ISC",
+	"author": "Jonas Strassel <info@jonas-strassel.de>",
+	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "2.3.6",
 		"@scalar/json-magic": "0.8.1",
@@ -35,5 +35,12 @@
 		"./cli": "./dist/cli.mjs",
 		"./lib": "./dist/lib.mjs",
 		"./*": "./*"
-	}
+	},
+	"bin": "./dist/cli.mjs",
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist"
+	]
 }
