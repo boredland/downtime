@@ -6,7 +6,6 @@ export default defineConfig({
 	},
 	clean: true,
 	format: ["esm"],
-	entry: { node: "src/index.ts" },
 	treeshake: true,
 	dts: {
 		resolve: true,

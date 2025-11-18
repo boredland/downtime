@@ -6,7 +6,8 @@ export const deserialize = (input: string) => {
 	let result: unknown;
 	try {
 		// biome-ignore lint/security/noGlobalEval: only used for deserializing trusted input
-		result = eval(`(${input})`);
+		// biome-ignore lint/complexity/noCommaOperator: needed for indirect eval
+		result = (0, eval)(`(${input})`);
 	} catch (e) {
 		errors.push(e as Error);
 	}
