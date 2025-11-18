@@ -1,4 +1,4 @@
-import { ConsoleAlert, defineConfig } from "./src/index.ts";
+import { ConsoleAlert, defineConfig } from "dowwntime";
 
 export default defineConfig({
 	openapiSpecUrl: "https://registry.scalar.com/@scalar/apis/galaxy?format=yaml",

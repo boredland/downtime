@@ -11,7 +11,7 @@ import type { Alert } from "./alert.ts";
 import { debug } from "./debug.ts";
 import { Storage } from "./storage.ts";
 
-type Options = {
+export type DowwntimeOptions = {
 	openapiSpecUrl: string;
 	storagePath: string;
 	concurrency?: number;
@@ -27,7 +27,7 @@ type Options = {
 	alerts: Alert[];
 };
 
-export const defineConfig = (options: Options) => {
+export const defineConfig = (options: DowwntimeOptions) => {
 	return options;
 };
 

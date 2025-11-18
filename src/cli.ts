@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-
+import "./index.ts";
+import path from "node:path";
 import { program } from "commander";
+import { defineConfig, run } from "./index.ts";
 
 program.option(
 	"-c, --config [string]",
@@ -19,11 +21,14 @@ const configPath = options.config;
 // Dynamically import the config file
 const _path = path.resolve(process.cwd(), configPath);
 const configModule = await import(_path);
-const config = configModule.default || configModule;
+const config = configModule.default;
 
-import path from "node:path";
+if (!config || typeof config !== "object") {
+	throw new Error(
+		`Invalid config file: no or wrong default export found, was ${typeof config}`,
+	);
+}
+
 // Run the main function with the loaded config
 // Assuming the main function is named 'run' and is exported from index.ts
-import { run } from "./index.ts";
-
-await run(config);
+await run(defineConfig(config));
