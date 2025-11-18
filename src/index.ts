@@ -12,18 +12,29 @@ import { debug } from "./debug.ts";
 import { Storage } from "./storage.ts";
 
 export type DowwntimeOptions = {
+	// URL to OpenAPI spec
 	openapiSpecUrl: string;
+	// Path to store measurement data
 	storagePath: string;
+	// Number of concurrent requests
 	concurrency?: number;
+	// Number of samples to take per endpoint
+	samples?: number;
+	// Base URL to use for requests, overrides servers defined in OpenAPI spec
 	baseUrl?: string;
+	// Function to get example values for parameters
 	getExampleValue?: (paramName: string, path: string) => string | undefined;
+	// Function to determine status based on response
 	getStatus?: (
 		statusCode: number,
 		path: string,
 		durationMs: number,
 	) => "up" | "down" | "degraded";
+	// Request timeout in milliseconds
 	timeoutMs?: number;
+	// Maximum storage space usage in bytes
 	maxSpaceUsageBytes?: number;
+	// Alerts to trigger on status changes
 	alerts: Alert[];
 };
 
@@ -158,7 +169,24 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 
 	await Promise.all(
 		Array.from(fetchConfigurations.keys()).map(async (path) => {
-			const measurement = await throttledMeasure(path);
+			const measurement = (
+				await Promise.all(
+					new Array(options.samples ?? 5).map((_v) => throttledMeasure(path)),
+				)
+			).reduce(
+				(acc, curr) => {
+					if (!curr) return acc;
+					if (!acc) return curr;
+
+					// If any measurement is down, the overall status is down
+					acc.status = curr.status;
+					// For duration, we take the average of measurements
+					acc.durationMs = (acc.durationMs + curr.durationMs) / 2;
+
+					return acc;
+				},
+				undefined satisfies Awaited<ReturnType<typeof measure>>,
+			);
 			debug(`Measured ${path}:`, measurement);
 			if (!measurement) return;
 			await measurements.add(path, measurement);
