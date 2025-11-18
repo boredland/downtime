@@ -1,10 +1,4 @@
 {
 	"$schema": "node_modules/knip/schema-jsonc.json",
-	"workspaces": {
-		".": {
-			"entry": ["src/services/*.ts", "!src/services/_*.ts"],
-			"project": "src/**/*.ts",
-			"ignoreFiles": ["downtime.config.ts"]
-		}
-	}
+	"project": ["src/**/*.ts"]
 }
