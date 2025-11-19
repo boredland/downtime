@@ -24,14 +24,14 @@ export class ConsoleAlert implements Alert {
 
 	async onDown(path: string, state: State): Promise<void> {
 		// biome-ignore lint/suspicious/noConsole: literally a console alert
-		console.log(
+		console.error(
 			`[ALERT - DOWN] Path: ${path} is DOWN (${state.durationMs}ms).`,
 		);
 	}
 
 	async onDegraded(path: string, state: State): Promise<void> {
 		// biome-ignore lint/suspicious/noConsole: literally a console alert
-		console.log(
+		console.warn(
 			`[ALERT - DEGRADED] Path: ${path} is DEGRADED (${state.durationMs}ms).`,
 		);
 	}
@@ -63,21 +63,21 @@ export class SlackAlert implements Alert {
 
 	async onUp(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`🟢 (${path})[${state.url}] is UP (${state.durationMs}ms).`,
+			`🟢 [\`${path}\`](${state.url}) is UP (${state.durationMs}ms).`,
 			"good",
 		);
 	}
 
 	async onDown(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`🔴 (${path})[${state.url}] is DOWN (${state.durationMs}ms).`,
+			`🔴 [\`${path}\`](${state.url}) is DOWN (${state.durationMs}ms).`,
 			"danger",
 		);
 	}
 
 	async onDegraded(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`🟡 (${path})[${state.url}] is DEGRADED (${state.durationMs}ms).`,
+			`🟡 [\`${path}\`](${state.url}) is DEGRADED (${state.durationMs}ms).`,
 			"warning",
 		);
 	}
