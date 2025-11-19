@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import pThrottle from "p-throttle";
 import type { Alert } from "./alert.ts";
 import { debug } from "./debug.ts";
+import { measureRequest } from "./request.ts";
 import { Storage } from "./storage.ts";
 
 export type DowwntimeOptions = {
@@ -132,23 +133,26 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 	const measure = async (path: string) => {
 		const url = fetchConfigurations.get(path);
 		if (!url) return;
-		const start = Date.now();
 		let status: "up" | "down" | "degraded" = "down";
 		let durationMs: number | undefined;
+		const start = Date.now();
 		try {
-			const abortSignal = AbortSignal.timeout(options.timeoutMs ?? 5000);
-
-			const response = await fetch(url, {
+			const metrics = await measureRequest(url, {
 				method: "GET",
-				signal: abortSignal,
+				timeout: options.timeoutMs ?? 5000,
 			});
 
-			durationMs = Date.now() - start;
+			durationMs = metrics.timeToFirstByteMs;
 
 			if (options.getStatus) {
-				status = options.getStatus(response.status, path, durationMs);
+				status = options.getStatus(
+					metrics.statusCode,
+					path,
+					metrics.timeToFirstByteMs,
+				);
 			} else {
-				status = response.ok ? "up" : "down";
+				status =
+					metrics.statusCode >= 200 && metrics.statusCode < 300 ? "up" : "down";
 			}
 		} catch (_error) {
 			durationMs = Date.now() - start;
