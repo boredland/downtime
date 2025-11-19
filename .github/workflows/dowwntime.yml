@@ -41,7 +41,7 @@ jobs:
           npx dowwntime@latest
       - name: Check in result
         run: |
-          git add .
+          git add storage.tmp
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "chore: Dowwntime check result at $(date -u +"%Y-%m-%dT%H:%M:%SZ")" || echo "No changes to commit"

@@ -209,64 +209,7 @@ The orphan branch will contain the `storage.tmp` file with monitoring history an
 
 ### Workflow Configuration
 
-Create `.github/workflows/dowwntime.yml` in your repository:
-
-```yaml
-name: Dowwntime check
-
-on:
-  schedule:
-    - cron: "*/5 * * * *" # Every 5 minutes
-  workflow_dispatch: # Manual trigger
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/dowwntime.yml"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  dowwntime-check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: dowwntime # Check out the orphan branch
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Create minimal package.json
-        run: echo '{"name":"dowwntime","version":"1.0.0","type":"module"}' > package.json
-
-      - name: Install dependencies
-        run: npm install dowwntime@latest
-
-      - name: Retrieve config from main branch
-        run: |
-          git fetch origin main
-          git checkout origin/main -- dowwntime.config.ts
-          git reset HEAD dowwntime.config.ts
-
-      - name: Run downtime check
-        id: result
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # If using Slack alerts
-        run: npx dowwntime
-
-      - name: Commit results
-        run: |
-          git add storage.tmp
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: Dowwntime check result at $(date -u +"%Y-%m-%dT%H:%M:%SZ")" || echo "No changes to commit"
-          git push origin HEAD:dowwntime
-```
+Create `.github/workflows/dowwntime.yml` in your repository. Take a look [here](./.github/workflows/dowwntime.yml) for a working example.
 
 ### How It Works
 
