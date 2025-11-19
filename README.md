@@ -186,7 +186,7 @@ An orphan branch keeps monitoring history separate from your main codebase:
 
 ```bash
 # Create a new orphan branch (contains no history)
-git checkout --orphan dowwntime
+git switch --orphan dowwntime
 
 # Clear the working directory
 git rm -rf .
