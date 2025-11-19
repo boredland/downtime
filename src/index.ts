@@ -6,35 +6,36 @@ import {
 } from "@scalar/json-magic/bundle/plugins/browser";
 import { readFiles } from "@scalar/json-magic/bundle/plugins/node";
 import { dereference } from "@scalar/openapi-parser";
+import dayjs from "dayjs";
 import pThrottle from "p-throttle";
 import type { Alert } from "./alert.ts";
 import { debug } from "./debug.ts";
 import { Storage } from "./storage.ts";
 
 export type DowwntimeOptions = {
-	// URL to OpenAPI spec
+	/** URL to OpenAPI spec */
 	openapiSpecUrl: string;
-	// Path to store measurement data
+	/** Path to store measurement data */
 	storagePath: string;
-	// Number of concurrent requests
+	/** Number of concurrent requests */
 	concurrency?: number;
-	// Number of samples to take per endpoint
+	/** Number of samples to take per endpoint */
 	samples?: number;
-	// Base URL to use for requests, overrides servers defined in OpenAPI spec
+	/** Base URL to use for requests, overrides servers defined in OpenAPI spec */
 	baseUrl?: string;
-	// Function to get example values for parameters
+	/** Function to get example values for parameters */
 	getExampleValue?: (paramName: string, path: string) => string | undefined;
-	// Function to determine status based on response
+	/** Function to determine status based on response */
 	getStatus?: (
 		statusCode: number,
 		path: string,
 		durationMs: number,
 	) => "up" | "down" | "degraded";
-	// Request timeout in milliseconds
+	/** Request timeout in milliseconds */
 	timeoutMs?: number;
-	// Maximum storage space usage in bytes
+	/** Maximum storage space usage in bytes */
 	maxSpaceUsageBytes?: number;
-	// Alerts to trigger on status changes
+	/** Alerts to trigger on status changes */
 	alerts: Alert[];
 };
 
@@ -220,6 +221,88 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 			}
 		}
 	}
+
+	const reports = await Promise.all(
+		[...fetchConfigurations.keys()].map(async (path) => {
+			const history = await measurements.getHistory(path);
+
+			const startOfPast60m = dayjs()
+				.subtract(60, "minute")
+				.startOf("minute")
+				.get("milliseconds");
+			const startOfPast24h = dayjs()
+				.subtract(24, "hours")
+				.startOf("hour")
+				.get("milliseconds");
+			const startOfPast7d = dayjs()
+				.subtract(7, "day")
+				.startOf("day")
+				.get("milliseconds");
+			const startOfPast30d = dayjs()
+				.subtract(30, "day")
+				.startOf("day")
+				.get("milliseconds");
+
+			const getAvergageDuration = (since: number) => {
+				const filtered = history.filter((item) => item.timestamp >= since);
+				if (filtered.length === 0) return null;
+				const total = filtered.reduce((acc, curr) => acc + curr.durationMs, 0);
+				return Math.round(total / filtered.length);
+			};
+
+			const avgDuration60m = getAvergageDuration(startOfPast60m);
+			const avgDuration24h = getAvergageDuration(startOfPast24h);
+			const avgDuration7d = getAvergageDuration(startOfPast7d);
+			const avgDuration30d = getAvergageDuration(startOfPast30d);
+
+			const getRelativeDowntime = (since: number) => {
+				const filtered = history.filter((item) => item.timestamp >= since);
+				if (filtered.length === 0) return null;
+				const downCount = filtered.filter(
+					(item) => item.status === "down",
+				).length;
+				return downCount / filtered.length;
+			};
+
+			const relDowntime60m = getRelativeDowntime(startOfPast60m);
+			const relDowntime24h = getRelativeDowntime(startOfPast24h);
+			const relDowntime7d = getRelativeDowntime(startOfPast7d);
+			const relDowntime30d = getRelativeDowntime(startOfPast30d);
+
+			const getRelativeDegraded = (since: number) => {
+				const filtered = history.filter((item) => item.timestamp >= since);
+				if (filtered.length === 0) return null;
+				const degradedCount = filtered.filter(
+					(item) => item.status === "degraded",
+				).length;
+				return degradedCount / filtered.length;
+			};
+
+			const relDegraded60m = getRelativeDegraded(startOfPast60m);
+			const relDegraded24h = getRelativeDegraded(startOfPast24h);
+			const relDegraded7d = getRelativeDegraded(startOfPast7d);
+			const relDegraded30d = getRelativeDegraded(startOfPast30d);
+
+			return {
+				path,
+				relDowntime60m,
+				relDegraded60m,
+				avgDuration60m,
+				relDowntime24h,
+				relDegraded24h,
+				avgDuration24h,
+				relDowntime7d,
+				relDegraded7d,
+				avgDuration7d,
+				relDowntime30d,
+				relDegraded30d,
+				avgDuration30d,
+			};
+		}),
+	);
+
+	// biome-ignore lint/suspicious/noConsole: fine here
+	console.table(reports);
 };
 
 export * from "./alert.ts";

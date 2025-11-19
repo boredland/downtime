@@ -129,4 +129,13 @@ export class Storage {
 				: null,
 		};
 	}
+
+	public async getHistory(path: string) {
+		const data = await this.ensureLoaded();
+		return (data.get(path) ?? []).map(([timestamp, status, durationMs]) => ({
+			timestamp,
+			status,
+			durationMs,
+		}));
+	}
 }
