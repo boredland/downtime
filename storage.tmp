@@ -1,0 +1,1 @@
+new Map([["/planets",[[1763537738005,"up",232,"https://galaxy.scalar.com/planets?limit=undefined&offset=undefined"]]],["/planets/{planetId}",[[1763537738010,"up",452,"https://galaxy.scalar.com/planets/1"]]],["/me",[[1763537739004,"down",40,"https://galaxy.scalar.com/me"]]]])
