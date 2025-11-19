@@ -1,6 +1,6 @@
 {
 	"name": "dowwntime",
-	"version": "1.0.11",
+	"version": "1.0.12",
 	"description": "",
 	"type": "module",
 	"scripts": {
@@ -23,6 +23,7 @@
 		"@types/node": "24.10.1",
 		"commander": "14.0.2",
 		"devalue": "5.5.0",
+		"dowwntime": "latest",
 		"knip": "5.69.1",
 		"lefthook": "2.0.4",
 		"npm-run-all2": "8.0.4",

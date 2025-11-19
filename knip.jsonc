@@ -1,4 +1,5 @@
 {
 	"$schema": "node_modules/knip/schema-jsonc.json",
+	"ignoreDependencies": ["dowwntime"],
 	"project": ["src/**/*.ts"]
 }

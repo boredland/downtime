@@ -63,21 +63,21 @@ export class SlackAlert implements Alert {
 
 	async onUp(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`🟢 [\`${path}\`](${state.url}) is UP (${state.durationMs}ms).`,
+			`🟢 <${state.url}|\`${path}\`> is UP (${state.durationMs}ms).`,
 			"good",
 		);
 	}
 
 	async onDown(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`🔴 [\`${path}\`](${state.url}) is DOWN (${state.durationMs}ms).`,
+			`🔴 <${state.url}|\`${path}\`> is DOWN (${state.durationMs}ms).`,
 			"danger",
 		);
 	}
 
 	async onDegraded(path: string, state: State): Promise<void> {
 		await this.sendSlackMessage(
-			`🟡 [\`${path}\`](${state.url}) is DEGRADED (${state.durationMs}ms).`,
+			`🟡 <${state.url}|\`${path}\`> is DEGRADED (${state.durationMs}ms).`,
 			"warning",
 		);
 	}
