@@ -40,6 +40,8 @@ jobs:
           git reset
       - name: Run dowwntime check
         id: result
+        env:
+          NODE_DEBUG: "dowwntime"
         run: |
           npx dowwntime@latest
       - name: Check in result
