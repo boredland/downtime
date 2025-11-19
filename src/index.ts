@@ -154,12 +154,16 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 			status = "down";
 		}
 
-		return {
+		const measurement = {
 			status,
 			durationMs,
 			timestamp: start,
 			url: url.toString(),
 		};
+
+		debug(`Measured ${path}:`, measurement);
+
+		return measurement;
 	};
 
 	const throttledMeasure = pThrottle({
@@ -188,7 +192,7 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 				undefined satisfies Awaited<ReturnType<typeof measure>>,
 			);
 
-			debug(`Measured ${path}:`, measurement);
+			debug(`Measured ${path} (avg):`, measurement);
 			if (!measurement) return;
 			await measurements.add(path, measurement);
 		}),
