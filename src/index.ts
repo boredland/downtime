@@ -141,18 +141,12 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 				method: "GET",
 				timeout: options.timeoutMs ?? 5000,
 			});
-
-			durationMs = metrics.timeToFirstByteMs;
+			durationMs = metrics.durationMs;
 
 			if (options.getStatus) {
-				status = options.getStatus(
-					metrics.statusCode,
-					path,
-					metrics.contentTransferMs,
-				);
+				status = options.getStatus(metrics.statusCode, path, durationMs);
 			} else {
-				status =
-					metrics.statusCode >= 200 && metrics.statusCode < 300 ? "up" : "down";
+				status = metrics.statusCode >= 200 && durationMs < 300 ? "up" : "down";
 			}
 		} catch (_error) {
 			durationMs = Date.now() - start;
