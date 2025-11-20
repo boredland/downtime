@@ -172,18 +172,33 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 
 	await Promise.all(
 		Array.from(fetchConfigurations.keys()).map(async (path) => {
-			const mesaurements = await Promise.all(
+			const results = await Promise.all(
 				Array.from({ length: options.samples ?? 5 }).map(() =>
 					throttledMeasure(path),
 				),
 			);
-			const measurement = mesaurements.reduce(
+
+			// Filter out spikes: keep values within 1.5 * IQR of Q1-Q3
+			const durations = results
+				.map((r) => r?.durationMs ?? 0)
+				.sort((a, b) => a - b);
+			const q1 = durations[Math.floor(durations.length * 0.25)] ?? 0;
+			const q3 = durations[Math.floor(durations.length * 0.75)] ?? 0;
+			const iqr = q3 - q1;
+			const lowerBound = q1 - 1.5 * iqr;
+			const upperBound = q3 + 1.5 * iqr;
+
+			const filteredResults = results.filter(
+				(r) => r && r.durationMs >= lowerBound && r.durationMs <= upperBound,
+			);
+
+			const measurement = filteredResults.reduce(
 				(acc, curr) => {
 					if (!acc) return curr;
 					if (!curr) return acc;
 
 					acc.status = curr.status;
-					// For duration, we take the average of measurements
+					// For duration, we take the average of filtered measurements
 					acc.durationMs = Math.round((acc.durationMs + curr.durationMs) / 2);
 
 					return acc;
