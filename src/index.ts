@@ -148,7 +148,7 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 				status = options.getStatus(
 					metrics.statusCode,
 					path,
-					metrics.timeToFirstByteMs,
+					metrics.contentTransferMs,
 				);
 			} else {
 				status =

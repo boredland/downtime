@@ -14,7 +14,11 @@ export const measureRequest = async (
 		tcpConnectionMs: number;
 		tlsHandshakeMs: number;
 		timeToFirstByteMs: number;
+		contentTransferMs: number;
+		totalTimeMs: number;
 	}>((resolve) => {
+		let firstByteAt: number;
+		let endAt: number;
 		let dnsLookupAt: number;
 		let tcpConnectionAt: number;
 		let tlsHandshakeAt: number;
@@ -23,12 +27,18 @@ export const measureRequest = async (
 		const req = http.request(url, options, (res) => {
 			statusCode = res.statusCode || 0;
 			res.once("readable", () => {
+				firstByteAt = Date.now();
+			});
+			res.on("end", () => {
+				endAt = Date.now();
 				resolve({
 					statusCode,
 					dnsLookupMs: dnsLookupAt - startAt,
 					tcpConnectionMs: tcpConnectionAt - dnsLookupAt,
 					tlsHandshakeMs: tlsHandshakeAt - tcpConnectionAt,
-					timeToFirstByteMs: Date.now() - tlsHandshakeAt,
+					timeToFirstByteMs: firstByteAt - tlsHandshakeAt,
+					contentTransferMs: endAt - firstByteAt,
+					totalTimeMs: endAt - startAt,
 				});
 			});
 		});
