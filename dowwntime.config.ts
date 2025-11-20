@@ -20,7 +20,8 @@ export default defineConfig({
 		}
 		return "down";
 	},
-	concurrency: 2,
+	concurrency: 10,
+	samples: 100,
 	timeoutMs: 5000,
 	storagePath: "./storage.tmp",
 	maxSpaceUsageBytes: 262144 * 0.1,
