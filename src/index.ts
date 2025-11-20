@@ -282,19 +282,19 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 			const relDegraded30d = getRelativeDegraded(startOfPast30d);
 
 			return {
-				path,
-				relDowntime60m,
-				relDegraded60m,
-				avgDuration60m,
-				relDowntime24h,
-				relDegraded24h,
-				avgDuration24h,
-				relDowntime7d,
-				relDegraded7d,
-				avgDuration7d,
-				relDowntime30d,
-				relDegraded30d,
-				avgDuration30d,
+				path: `${path} - ${history[history.length - 1]?.status ?? "unknown"} - ${history[history.length - 1]?.durationMs ?? 0}ms`,
+				down60m: relDowntime60m,
+				degr60m: relDegraded60m,
+				dur60m: avgDuration60m,
+				down24h: relDowntime24h,
+				degr24h: relDegraded24h,
+				dur24h: avgDuration24h,
+				down7d: relDowntime7d,
+				degr7d: relDegraded7d,
+				dur7d: avgDuration7d,
+				down30d: relDowntime30d,
+				degr30d: relDegraded30d,
+				dur30d: avgDuration30d,
 			};
 		}),
 	);
