@@ -133,36 +133,26 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 	const measure = async (path: string) => {
 		const url = fetchConfigurations.get(path);
 		if (!url) return;
-		let status: "up" | "down" | "degraded" = "down";
-		let durationMs: number | undefined;
 		const start = Date.now();
 		try {
 			const metrics = await measureRequest(url, {
 				method: "GET",
 				timeout: options.timeoutMs ?? 5000,
 			});
-			durationMs = metrics.durationMs;
-
-			if (options.getStatus) {
-				status = options.getStatus(metrics.statusCode, path, durationMs);
-			} else {
-				status = metrics.statusCode >= 200 && durationMs < 300 ? "up" : "down";
-			}
+			debug(`Measured ${path}:`, metrics);
+			return {
+				...metrics,
+				url: url.toString(),
+				timestamp: start,
+			};
 		} catch (_error) {
-			durationMs = Date.now() - start;
-			status = "down";
+			return {
+				statusCode: 0,
+				durationMs: Date.now() - start,
+				url: url.toString(),
+				timestamp: start,
+			};
 		}
-
-		const measurement = {
-			status,
-			durationMs,
-			timestamp: start,
-			url: url.toString(),
-		};
-
-		debug(`Measured ${path}:`, measurement);
-
-		return measurement;
 	};
 
 	const throttledMeasure = pThrottle({
@@ -192,19 +182,29 @@ export const run = async (options: ReturnType<typeof defineConfig>) => {
 				(r) => r && r.durationMs >= lowerBound && r.durationMs <= upperBound,
 			);
 
-			const measurement = filteredResults.reduce(
-				(acc, curr) => {
-					if (!acc) return curr;
-					if (!curr) return acc;
-
-					acc.status = curr.status;
-					// For duration, we take the average of filtered measurements
-					acc.durationMs = Math.round((acc.durationMs + curr.durationMs) / 2);
-
-					return acc;
-				},
-				undefined satisfies Awaited<ReturnType<typeof measure>>,
+			const durationMs = Math.round(
+				filteredResults.reduce(
+					(acc, curr) => acc + (curr?.durationMs ?? 0),
+					0,
+				) / filteredResults.length,
 			);
+
+			let status: "up" | "down" | "degraded" = "down";
+			const statusCode = Math.max(
+				...filteredResults.map((r) => r?.statusCode ?? 0),
+			);
+			if (options.getStatus) {
+				status = options.getStatus(statusCode, path, durationMs);
+			} else {
+				status = statusCode >= 200 ? "up" : "down";
+			}
+
+			const measurement = {
+				status,
+				durationMs,
+				timestamp: Date.now(),
+				url: fetchConfigurations.get(path)?.toString() ?? "",
+			};
 
 			debug(`Measured ${path} (avg):`, measurement);
 			if (!measurement) return;
